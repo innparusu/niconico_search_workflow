@@ -10,7 +10,7 @@ def search_niconico_videos(search_word, client)
   body = { query: search_word,
            service: ["video"],
            search: ["title", "description", "tags"],
-           join: ["cmsid", "title"],
+           join: ["cmsid", "title", "thumbnail_url"],
            sort_by: "view_counter",
            issuer: "testApp"
   }
@@ -31,17 +31,17 @@ Alfred.with_friendly_error do |alfred|
   fb = alfred.feedback
 
   if ARGV.length > 0
-    search_word = ARGV.join(" ")
+    search_word = ARGV.join(" ").encode("UTF-8-MAC", "UTF-8").strip
     search_niconico_videos(search_word, client).each do |video|
       fb.add_item({
-        :uid      => "",
-        :title    => video["title"],
-        :subtitle => "http://www.nicovideo.jp/watch/#{video["cmsid"]}",
-        :arg      => "http://www.nicovideo.jp/watch/#{video["cmsid"]}",
-        :valid    => "yes",
+        uid:      "",
+        title:    video["title"],
+        subtitle: "http://www.nicovideo.jp/watch/#{video["cmsid"]}",
+        arg:      "http://www.nicovideo.jp/watch/#{video["cmsid"]}",
+        valid:    "yes",
       })
     end
+  else
   end
-
   puts fb.to_xml
 end
