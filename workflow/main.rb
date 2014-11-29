@@ -10,8 +10,8 @@ require 'pp'
 def search_niconico_videos(search_word, client)
   body = { query: search_word,
            service: ["video"],
-           search: ["title", "description", "tags"],
-           join: ["cmsid", "title", "view_counter", "comment_counter", "mylist_counter"],
+           search: ["title", "description", "tags", ""],
+           join: ["cmsid", "title", "view_counter", "comment_counter", "mylist_counter", "start_time"],
            sort_by: "view_counter",
            issuer: "testApp"
   }
@@ -24,8 +24,8 @@ def search_niconico_videos(search_word, client)
 
   return nil if JSON.parse(request.body.split("\n")[-3])["values"][0]["total"] == 0
 
-  results = JSON.parse(request.body.split("\n")[0])["values"]
-  return results
+  search_results = JSON.parse(request.body.split("\n")[0])["values"]
+  return search_results
 end
 
 
@@ -51,7 +51,7 @@ Alfred.with_friendly_error do |alfred|
     fb.add_item({
       uid:      "",
       title:    video["title"],
-      subtitle: "再生:#{video["view_counter"]} コメント:#{video["comment_counter"]} マイリスト:#{video["mylist_counter"]}",
+      subtitle: "投稿:#{video["start_time"]} 再生:#{video["view_counter"]} コメント:#{video["comment_counter"]} マイリスト:#{video["mylist_counter"]}",
       arg:      "http://www.nicovideo.jp/watch/#{video["cmsid"]}",
       valid:    "yes"
     })
