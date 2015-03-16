@@ -10,11 +10,11 @@ require 'pp'
 def search_niconico_videos(search_word, client)
   body = { query: search_word,
            service: ["video"],
-           search: ["title", "description", "tags", ""],
-           join: ["cmsid", "title", "view_counter", "comment_counter", "mylist_counter", "start_time"],
+           search: ["title", "description", "tags"],
+           join: ["cmsid", "title", "view_counter", "comment_counter", "mylist_counter", "start_time", "thumbnail_url"],
            sort_by: "view_counter",
            issuer: "testApp"
-  }
+         }
 
   request = client.post do |req|
     req.url '/api/snapshot/'
@@ -22,7 +22,7 @@ def search_niconico_videos(search_word, client)
     req.body = JSON.generate(body)
   end
 
-  return nil if JSON.parse(request.body.split("\n")[-3])["values"][0]["total"] == 0
+  return [] if JSON.parse(request.body.split("\n")[-3])["values"][0]["total"] == 0
 
   search_results = JSON.parse(request.body.split("\n")[0])["values"]
   return search_results
@@ -41,11 +41,6 @@ Alfred.with_friendly_error do |alfred|
 
   search_word = ARGV.join(" ").encode("UTF-8-MAC", "UTF-8").strip
   search_results = search_niconico_videos(search_word, client)
-
-  if search_results.nil?
-    puts fb.to_xml
-    break
-  end
 
   search_results.each do |video|
     fb.add_item({
