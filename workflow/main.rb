@@ -6,6 +6,7 @@ require "alfred"
 require 'json'
 require 'faraday'
 require 'pp'
+require 'open-uri'
 
 def search_niconico_videos(search_word, client)
   body = { query: search_word,
@@ -41,16 +42,21 @@ Alfred.with_friendly_error do |alfred|
 
   search_word = ARGV.join(" ").encode("UTF-8-MAC", "UTF-8").strip
   search_results = search_niconico_videos(search_word, client)
-
-  search_results.each do |video|
+  search_results.each_with_index do |video, i|
+    filename = "icon_#{i}"
+    open(filename, 'w') do |output|
+      open(video["thumbnail_url"]) do |data|
+        output.write(data.read)
+      end
+    end
     fb.add_item({
       uid:      "",
       title:    video["title"],
+      icon:     {name: filename},
       subtitle: "投稿:#{video["start_time"]} 再生:#{video["view_counter"]} コメント:#{video["comment_counter"]} マイリスト:#{video["mylist_counter"]}",
       arg:      "http://www.nicovideo.jp/watch/#{video["cmsid"]}",
       valid:    "yes"
     })
   end
-
   puts fb.to_xml
 end
