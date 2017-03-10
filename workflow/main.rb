@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
-
-require "alfred"
+require_relative 'bundle/bundler/setup'
+require 'alfred'
 require 'json'
 require 'faraday'
 require 'pp'
